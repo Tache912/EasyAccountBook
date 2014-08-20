@@ -51,22 +51,19 @@ void Tag::delTag()
 	deleteMark	=	true;
 	tagName		=	deletedTag;
 	tagHash		=	deletedHash;
-	Node<Tag> *currentNode = parentTag.getListHead();
+	Node<Tag> *currentNode = subTag.getListHead();
+
 	while(currentNode != nullptr)
 	{
-		currentNode->object->subTag.delNode(*this);
-		currentNode = currentNode -> nextNode;
-	}
-	currentNode = subTag.getListHead();
-	while(currentNode != nullptr)
-	{
-		currentNode->object->parentTag.delNode(*this);
-		if( currentNode-> object ->parentTag.isEmpty() )
+		currentNode -> object -> parentTag.delNode(*this);
+		if( currentNode-> object -> parentTag.isEmpty() )
 		{
 			currentNode-> object -> delTag();
 		}
 		currentNode = currentNode -> nextNode;
 	}
+	parentTag			=	Linklist<Tag>();
+	subTag				=	Linklist<Tag>();
 }
 bool Tag::hasParentTag(Tag &parentTag_in)
 {
@@ -140,6 +137,12 @@ unsigned int Tag::get_tagHashFunction(unsigned int size_in)
 Linklist<Tag> &Tag::get_parentTagList()
 {
 	return parentTag;
+}
+string Tag::toString()
+{
+	stringstream ss;
+	ss<<"[ tagName = "<<tagName<<" , hashcode = "<<tagHash<<" ]";
+	return ss.str();
 }
 Tag::~Tag()
 {

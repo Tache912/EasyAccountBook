@@ -39,6 +39,7 @@ public:
 	unsigned int					get_tagHashCode();
 	unsigned int					get_tagHashFunction(unsigned int size_in);
 	Linklist<Tag>					&get_parentTagList();
+	string							toString();
 	//Linklist<Tag>					*get_subTagList();
 	~Tag();
 };

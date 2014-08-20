@@ -2,7 +2,6 @@
 #include "Tag.h"
 #include "TagTable.h"
 
-
 TagTable::TagTable()
 {
 	tableSize		=	DEFAULT_TABLE_SIZE;
@@ -16,7 +15,7 @@ TagTable::TagTable()
 }
 TagTable::TagTable(unsigned int tableSize_in)
 {
-	tableSize		=	tableSize;
+	tableSize		=	tableSize_in;
 	occupation		=	1;
 	rootHash		=	Tag::rootHash;	
 	tagTable		=	new Tag[tableSize];
@@ -108,11 +107,11 @@ bool TagTable::editTag( string tag_old_in, string tag_new_in)
 {
 	Tag &oldTag = findTag( tag_old_in );
 	Tag &newTag  = findTag( tag_new_in );
-	if( &oldTag == nullptr )
+	if( oldTag.get_tagName() == Tag::emptyTag )
 	{
 		return false;
 	}
-	else if ( &newTag != nullptr )
+	else if ( newTag.get_tagName() != Tag::emptyTag )
 	{
 		return false;
 	}
@@ -139,7 +138,7 @@ bool TagTable::editTag( string tag_old_in, string tag_new_in)
 bool TagTable::deleteTag (string Tag_in )
 {
 	Tag &tagToDel = findTag( Tag_in );
-	if( &tagToDel == nullptr )
+	if( tagToDel.get_tagName() == Tag::emptyTag )
 	{
 		return false;
 	}
@@ -208,4 +207,13 @@ int TagTable::tagBelongTo( string tag1_in, string tag2_in )
 		return 1;
 	}
 	return 0;
+}
+std::string TagTable::toString()
+{
+	stringstream ss;
+	for(int i = 0; i < tableSize; i++)
+	{
+		ss<<i<<" : "<<tagTable[i].toString()<<endl;
+	}
+	return ss.str();
 }

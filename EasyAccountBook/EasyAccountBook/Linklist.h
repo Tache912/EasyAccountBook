@@ -109,7 +109,7 @@ bool Linklist<T>::delNode(T &object_in)
 template <typename T>
 bool Linklist<T>::isEmpty()
 {
-	return (bool)size;
+	return !(bool)size;
 }
 template <typename T>
 Linklist<T>::~Linklist()
