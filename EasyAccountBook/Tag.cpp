@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Tag.h"
+#include "TagTable.h"
 
 using namespace std;
 
@@ -46,8 +47,9 @@ bool Tag::hasParentTag()
 {
 	return !parentTag.isEmpty();
 }
-void Tag::delTag()
+void Tag::delTag(TagTable *table_in)
 {
+	(table_in	->	getOccupation()) --;
 	deleteMark	=	true;
 	tagName		=	deletedTag;
 	tagHash		=	deletedHash;
@@ -58,7 +60,7 @@ void Tag::delTag()
 		currentNode -> object -> parentTag.delNode(*this);
 		if( currentNode-> object -> parentTag.isEmpty() )
 		{
-			currentNode-> object -> delTag();
+			currentNode-> object -> delTag(table_in);
 		}
 		currentNode = currentNode -> nextNode;
 	}

@@ -2,7 +2,7 @@
 using namespace std;
 
 class TagNode;
-
+class TagTable;
 unsigned int BKDRHash(string &str_in);
 
 class Tag
@@ -31,7 +31,7 @@ public:
 	bool							hasParentTag(Tag &parentTag_in);
 	bool							hasParentTag();
 	bool							hasSubTag(Tag &subTag_in);
-	void							delTag();
+	void							delTag(TagTable *table_in);
 	bool							addParentTag(Tag &parentTag_in);
 	bool							addSubTag(Tag &subTag_in);
 	void							set_tagName(string	&tagName_in);

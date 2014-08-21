@@ -47,7 +47,11 @@ Tag &TagTable::findTag( string tag_in )
 }
 bool TagTable::addTag( string tag_in )//向根添加Tag
 {
-	Tag &tagToAdd = findTag( tag_in );
+	if( occupation > tableSize / 2)
+	{
+		resizeTable (tableSize * 2);
+	}
+	Tag & tagToAdd = findTag( tag_in );
 	if( tagToAdd.get_tagName() == emptyTag.get_tagName() )//该Tag未被TagTable收录
 	{
 		unsigned int hash			=	BKDRHash(tag_in);
@@ -68,8 +72,12 @@ bool TagTable::addTag( string tag_in )//向根添加Tag
 }
 bool TagTable::addTag( string parentTag_in, string tag_in)
 {
+	if(occupation > tableSize / 2)
+	{
+		resizeTable(tableSize * 2 );
+	}
 	Tag &parentTag = findTag( parentTag_in );
-	Tag &tagToAdd  = findTag( tag_in );
+	Tag &tagToAdd = findTag( tag_in );
 	if( parentTag.get_tagName() == emptyTag.get_tagName() )
 	{
 		return false;
@@ -137,7 +145,9 @@ bool TagTable::editTag( string tag_old_in, string tag_new_in)
 }
 bool TagTable::deleteTag (string Tag_in )
 {
+
 	Tag &tagToDel = findTag( Tag_in );
+
 	if( tagToDel.get_tagName() == Tag::emptyTag )
 	{
 		return false;
@@ -151,8 +161,13 @@ bool TagTable::deleteTag (string Tag_in )
 			if(table_Index >= tableSize) table_Index = 0;
 		}
 		tagTable[table_Index].set_tagNameAndHash(Tag::deletedTag,Tag::deletedHash);
-		tagToDel.delTag();
-		occupation--;
+		tagToDel.delTag(this);
+
+		if(occupation < tableSize / 8)
+		{
+			resizeTable(tableSize / 2 );
+		}
+
 		return true;
 	}
 }
@@ -217,13 +232,20 @@ std::string TagTable::toString()
 	}
 	return ss.str();
 }
-void TagTable::resizeHelper(unsigned int index)//递归遍历标签树
+unsigned int &TagTable::getOccupation()
+{
+	return occupation;
+}
+void TagTable::resizeHelper_1(Tag *newTagTable, unsigned int newSize, unsigned int index)//复制标签名称和hash值
 {
 
 	Linklist<Tag> &currentList = tagTable[index].get_subTagList();
-	cout<< tagTable[index].get_tagName()<<endl;
+	if(tagTable[index].get_tagName() != Tag::emptyTag )
+	{
+		newTagTable[tagTable[index].get_tagHashFunction(newSize)].set_tagNameAndHash(tagTable[index].get_tagName(),tagTable[index].get_tagHashCode());
+	}
 	currentList.resetCurrentNode();
-	Node<Tag> * currentNode = currentList.getNextCurrentNode();
+	Node<Tag> *currentNode = currentList.getNextCurrentNode();
 	while(currentNode != nullptr) 
 	{
 		int hashIndex = currentNode->object->get_tagHashFunction(tableSize);
@@ -231,7 +253,60 @@ void TagTable::resizeHelper(unsigned int index)//递归遍历标签树
 		{
 			hashIndex++;
 		}
-		resizeHelper(hashIndex);
+		resizeHelper_1(newTagTable, newSize, hashIndex);
+		currentNode = currentList.getNextCurrentNode();
+	}
+	currentList.resetCurrentNode();
+}
+void TagTable::resizeHelper_2(Tag *newTagTable, unsigned int newSize, unsigned int index)//重新构建关系链
+{
+
+	if(tagTable[index].get_tagName() != Tag::emptyTag )
+	{
+		Linklist<Tag> &oldParentTagList = tagTable[index].get_parentTagList();
+		Linklist<Tag> &oldSubTagList = tagTable[index].get_subTagList();
+
+		if( ! oldParentTagList.isEmpty() )
+		{
+			
+			Linklist<Tag> &newParentTagList = newTagTable[tagTable[index].get_tagHashFunction(newSize)].get_parentTagList();
+			Node<Tag> *oldParentTagNode = oldParentTagList.getListHead();
+			Node<Tag> *oldParentTagNodeSave = oldParentTagNode;
+			while(oldParentTagNode != nullptr)
+			{
+				newParentTagList.addNode(newTagTable[oldParentTagNode->object->get_tagHashFunction(newSize)]);
+				oldParentTagNode = oldParentTagNode ->nextNode;
+			}
+			oldParentTagNode = oldParentTagNodeSave;
+		}
+		if( ! oldSubTagList.isEmpty() )
+		{
+			Linklist<Tag> &newSubTagList = newTagTable[tagTable[index].get_tagHashFunction(newSize)].get_subTagList();
+			
+			Node<Tag> *oldSubTagNode = oldSubTagList.getListHead();
+			Node<Tag> *oldSubTagNodeSave = oldSubTagNode;
+			while( oldSubTagNode != nullptr)
+			{
+				newSubTagList.addNode(newTagTable[oldSubTagNode->object->get_tagHashFunction(newSize)]);
+				oldSubTagNode = oldSubTagNode -> nextNode;
+			}
+			oldSubTagNode = oldSubTagNodeSave;
+			
+		}
+	}
+	
+	
+	Linklist<Tag> &currentList = tagTable[index].get_subTagList();
+	currentList.resetCurrentNode();
+	Node<Tag> *currentNode = currentList.getNextCurrentNode();
+	while(currentNode != nullptr) 
+	{
+		int hashIndex = currentNode->object->get_tagHashFunction(tableSize);
+		while (tagTable[hashIndex].get_tagName() != currentNode->object ->get_tagName() )
+		{
+			hashIndex++;
+		}
+		resizeHelper_2(newTagTable, newSize, hashIndex);
 		currentNode = currentList.getNextCurrentNode();
 	}
 	currentList.resetCurrentNode();
@@ -240,7 +315,7 @@ bool TagTable::resizeTable( unsigned int size_in )
 {
 	if( size_in <= occupation )
 	{
-		cerr<<"原来散列表就够满了，你要作死么？"<<endl;
+		cerr<<"空间过小"<<endl;
 		return false;
 	}
 	Tag *newTagTable = new Tag[size_in];
@@ -249,9 +324,10 @@ bool TagTable::resizeTable( unsigned int size_in )
 		cerr<<"新散列表创建失败"<<endl;
 		return false;
 	}
-	
-	
-
+	resizeHelper_1(newTagTable,size_in,rootHash%tableSize);
+	resizeHelper_2(newTagTable,size_in,rootHash%tableSize);
+	delete [] tagTable;
+	tagTable = newTagTable;
 	tableSize = size_in;
 	return true;
 }
