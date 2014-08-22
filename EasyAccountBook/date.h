@@ -22,6 +22,8 @@ public:
 	int getWeekday();
 	string toString();
 	static int getWeekdayfromYMD(int year_in, int mon_in, int day_in);
+	bool setDate(int year_in, int mon_in, int day_in);
+
 	bool operator>(const date &date_right);
 	bool operator<(const date &date_right);
 	bool operator==(const date &date_right);

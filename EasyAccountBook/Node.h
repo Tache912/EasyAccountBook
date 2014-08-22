@@ -29,6 +29,14 @@ Node<T>::Node(Node<T> *previrousNode_in,Node<T> *nextNode_in, T &object_in)
 template <typename T>
 Node<T>::~Node()
 {
+	if(previrousNode != nullptr)
+	{
+		previrousNode -> nextNode = nextNode;
+	}
+	if(nextNode != nullptr)
+	{
+		nextNode -> previrousNode = previrousNode;
+	}
 	previrousNode	=	nullptr;
 	nextNode		=	nullptr;
 	object			=	nullptr;

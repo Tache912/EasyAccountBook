@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "date.h"
+
 
 using namespace std;
 bool check_day(int year_in, int mon_in, int day_in);
@@ -227,6 +227,25 @@ date::date(date &date_in,bool add_or_minus)
 				}
 			}
 		}
+	}
+}
+bool date::setDate(int year_in, int mon_in, int day_in)
+{
+	if(!check_day(year_in, mon_in, day_in))
+	{
+		year	=	-1;
+		mon		=	-1;
+		day		=	-1;
+		weekday	=	-1;
+		return false;
+	}
+	else
+	{
+		year	=	year_in;
+		mon		=	mon_in;
+		day		=	day_in;
+		weekday	=	getWeekdayfromYMD(year_in, mon_in, day_in);
+		return true;
 	}
 }
 int date::getYear() const 

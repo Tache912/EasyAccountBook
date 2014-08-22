@@ -1,8 +1,10 @@
 #include "stdafx.h"
-using namespace std;
+#ifndef TAG_H
+#define TAG_H
 
-class TagNode;
+using namespace std;
 class TagTable;
+
 unsigned int BKDRHash(string &str_in);
 
 class Tag
@@ -47,3 +49,4 @@ public:
 	//Linklist<Tag>					*get_subTagList();
 	~Tag();
 };
+#endif

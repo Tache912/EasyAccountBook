@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Tag.h"
 #include "TagTable.h"
-
 using namespace std;
 
 unsigned int BKDRHash(string &str_in)

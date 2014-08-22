@@ -119,6 +119,8 @@ bool Linklist<T>::delNode(T &object_in)
 		{
 			//do nothing
 		}
+		currentNode -> nextNode = nullptr;
+		currentNode -> previrousNode = nullptr;
 		delete currentNode;
 		currentNode = nullptr;
 		size--;
@@ -143,7 +145,7 @@ Linklist<T>::~Linklist()
 		while(currentNode -> nextNode != nullptr)
 		{
 			currentNode = currentNode -> nextNode;
-			delete currentNode ->previrousNode;
+			delete currentNode -> previrousNode;
 			size--;
 		}
 		delete currentNode;
