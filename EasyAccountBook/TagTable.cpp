@@ -240,10 +240,13 @@ void TagTable::resizeHelper_1(Tag *newTagTable, unsigned int newSize, unsigned i
 {
 
 	Linklist<Tag> &currentList = tagTable[index].get_subTagList();
-	if(tagTable[index].get_tagName() != Tag::emptyTag )
+	unsigned int newIndex = tagTable[index].get_tagHashFunction(newSize);
+	while(newTagTable[newIndex].get_tagName() != Tag::emptyTag)
 	{
-		newTagTable[tagTable[index].get_tagHashFunction(newSize)].set_tagNameAndHash(tagTable[index].get_tagName(),tagTable[index].get_tagHashCode());
+		newIndex++;
 	}
+	newTagTable[newIndex].set_tagNameAndHash(tagTable[index].get_tagName(),tagTable[index].get_tagHashCode());
+	
 	currentList.resetCurrentNode();
 	Node<Tag> *currentNode = currentList.getNextCurrentNode();
 	while(currentNode != nullptr) 

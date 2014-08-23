@@ -115,7 +115,7 @@ const account &accountBook::findIncome(unsigned int idKey_in)
 	return account();
 }
 
-const account &accountBook::findIncome(unsigned int idKey_in)
+const account &accountBook::findExpenditure(unsigned int idKey_in)
 {
 	expenditureAccounts.resetCurrentNode();
 	Node<account> *currentNode = expenditureAccounts.getNextCurrentNode();
